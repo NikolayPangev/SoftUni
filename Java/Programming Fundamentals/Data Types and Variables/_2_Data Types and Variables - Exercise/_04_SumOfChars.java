@@ -12,4 +12,4 @@ public class _04_SumOfChars {
         }
         System.out.printf("The sum equals: %d", sum);
     }
-}
+} 
