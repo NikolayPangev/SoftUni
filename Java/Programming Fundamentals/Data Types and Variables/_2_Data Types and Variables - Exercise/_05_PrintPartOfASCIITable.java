@@ -10,4 +10,4 @@ public class _05_PrintPartOfASCIITable {
             System.out.print((char) i + " ");
         }
     }
-}
+} 
