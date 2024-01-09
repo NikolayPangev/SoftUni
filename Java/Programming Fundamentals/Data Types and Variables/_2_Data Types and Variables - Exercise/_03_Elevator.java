@@ -17,4 +17,4 @@ public class _03_Elevator {
         int totalCourses = fullCourses + remainingCourses;
         System.out.println(totalCourses);
     }
-}
+} 
