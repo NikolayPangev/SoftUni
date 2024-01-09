@@ -14,4 +14,4 @@ public class _02_SumDigits {
 
         System.out.println(sum);
     }
-} 
+}
