@@ -27,14 +27,3 @@ VALUES
 (104, 'Model X', 2),
 (105, 'Model 3', 2),
 (106, 'Nova', 3);
-
-CREATE TABLE students(
-	student_id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL
-);
-
-INSERT INTO students (student_id, name)
-VALUES
-(1, 'Mila'),
-(2, 'Toni'),
-(3, 'Ron');
