@@ -1,6 +1,6 @@
 DELIMITER $
 
-CREATE PROCEDURE usp_calculate_future_value_for_account(acc_id INT, interest_rate DOUBLE)
+CREATE PROCEDURE usp_calculate_future_value_for_account(acc_id INT, interest_rate DECIMAL(19, 4))
 BEGIN
 	SELECT a.id AS account_id,
     ah.first_name, 
