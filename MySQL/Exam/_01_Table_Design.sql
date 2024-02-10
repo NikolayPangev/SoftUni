@@ -1,6 +1,6 @@
 DROP DATABASE IF EXISTS preserves;
 CREATE DATABASE preserves;
-USE preserve;
+USE preserves;
 
 CREATE TABLE continents(
 	id INT PRIMARY KEY AUTO_INCREMENT,
