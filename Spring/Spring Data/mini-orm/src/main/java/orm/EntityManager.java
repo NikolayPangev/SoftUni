@@ -1,20 +1,23 @@
 package orm;
 
+import annotations.Column;
 import annotations.Entity;
 import annotations.Id;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static entities.constants.Constants.COMMA_SEPARATOR;
-import static entities.constants.Constants.ID_COLUM_MISSING_MESSAGE;
+import static entities.constants.Constants.*;
+import static entities.constants.Constants.Queries.*;
 import static orm.MyConnector.getConnection;
 
-public class EntityManager<E> implements DBContext {
+public class EntityManager<E> implements DBContext<E> {
     private final Connection connection;
 
     public EntityManager() throws SQLException {
@@ -22,15 +25,16 @@ public class EntityManager<E> implements DBContext {
     }
 
     @Override
-    public boolean persist(E entity) {
+    public boolean persist(E entity) throws SQLException, IllegalAccessException {
         final Field idColumn = getIdColumn(entity.getClass());
         idColumn.setAccessible(true);
 
         final Object idValue = idColumn.get(entity);
 
-        if (idValue == null || (long) idValue <= 0){
+        if (idValue == null || (long) idValue <= 0) {
             return doInsert(entity);
         }
+
         return doUpdate(entity, idColumn);
     }
 
@@ -64,7 +68,7 @@ public class EntityManager<E> implements DBContext {
         return false;
     }
 
-    private boolean doInsert(E entity) {
+    private boolean doInsert(E entity) throws SQLException {
         final String tableName = getTableName(entity.getClass());
 
         final List<EntityManager.KeyValuePair> keyValuePairs = getKeyValuePairs(entity);
@@ -77,8 +81,42 @@ public class EntityManager<E> implements DBContext {
                 .map(EntityManager.KeyValuePair::value)
                 .collect(Collectors.joining(COMMA_SEPARATOR));
 
-        final String insertQuery = String.format()
-        return false;
+        final String insertQuery = String.format(INSET_QUERY_FORMAT, tableName, fields, values);
+
+        return connection.prepareStatement(insertQuery).execute();
+    }
+
+    private String getTableName(Class<?> aClass) {
+        final Entity[] annotationsByType = aClass.getAnnotationsByType(Entity.class);
+
+        if (annotationsByType.length == 0) throw new UnsupportedOperationException(CLASS_MUST_BE_ENTITY_MESSAGE);
+
+        return annotationsByType[0].name();
+    }
+
+    private List<EntityManager.KeyValuePair> getKeyValuePairs(E entity) {
+        final Class<?> aClass = entity.getClass();
+
+        return Arrays.stream(aClass.getDeclaredFields())
+                .filter(f -> !f.isAnnotationPresent(Id.class) && f.isAnnotationPresent(Column.class))
+                .map(f -> new EntityManager.KeyValuePair(f.getAnnotationsByType(Column.class)[0].name(),
+                        mapFieldsToGivenType(f, entity)))
+                .collect(Collectors.toList());
+    }
+
+    private String mapFieldsToGivenType(Field field, E entity) {
+        field.setAccessible(true);
+
+        Object o = null;
+        try{
+            o = field.get(entity);
+        } catch (IllegalAccessException e){
+            e.printStackTrace();
+        }
+
+        return o instanceof String || o instanceof LocalDate
+                ? "'" + o + "'"
+                : Objects.requireNonNull(o).toString();
     }
 
     public record KeyValuePair(String key, String value){
