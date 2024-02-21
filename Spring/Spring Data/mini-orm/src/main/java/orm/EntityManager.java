@@ -57,6 +57,7 @@ public class EntityManager<E> implements DBContext<E> {
     public Object findFirst(Class table, String where) {
         return null;
     }
+
     private Field getIdColumn(Class<?> entity) {
         return Arrays.stream(entity.getDeclaredFields())
                 .filter(x -> x.isAnnotationPresent(Id.class))
@@ -64,9 +65,6 @@ public class EntityManager<E> implements DBContext<E> {
                 .orElseThrow(() -> new UnsupportedOperationException(ID_COLUM_MISSING_MESSAGE));
     }
 
-    private boolean doUpdate(E entity, Field idColumn) {
-        return false;
-    }
 
     private boolean doInsert(E entity) throws SQLException {
         final String tableName = getTableName(entity.getClass());
@@ -82,6 +80,22 @@ public class EntityManager<E> implements DBContext<E> {
                 .collect(Collectors.joining(COMMA_SEPARATOR));
 
         final String insertQuery = String.format(INSET_QUERY_FORMAT, tableName, fields, values);
+
+        return connection.prepareStatement(insertQuery).execute();
+    }
+
+    private boolean doUpdate(E entity, Field idColumn) throws IllegalAccessException, SQLException {
+        final String tableName = getTableName(entity.getClass());
+
+        final List<EntityManager.KeyValuePair> keyValuePairs = getKeyValuePairs(entity);
+
+        final String updateValues = keyValuePairs.stream()
+                .map(keyValuePair -> String.format(UPDATE_VALUE_FORMAT, keyValuePair.key, keyValuePair.value))
+                .collect(Collectors.joining(COMMA_SEPARATOR));
+
+        final int idValue = Integer.parseInt(idColumn.get(entity).toString());
+
+        final String insertQuery = String.format(UPDATE_QUERY_BY_ID_FORMAT, tableName, updateValues, idValue);
 
         return connection.prepareStatement(insertQuery).execute();
     }
@@ -108,9 +122,9 @@ public class EntityManager<E> implements DBContext<E> {
         field.setAccessible(true);
 
         Object o = null;
-        try{
+        try {
             o = field.get(entity);
-        } catch (IllegalAccessException e){
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
 
@@ -119,6 +133,6 @@ public class EntityManager<E> implements DBContext<E> {
                 : Objects.requireNonNull(o).toString();
     }
 
-    public record KeyValuePair(String key, String value){
+    public record KeyValuePair(String key, String value) {
     }
 }
