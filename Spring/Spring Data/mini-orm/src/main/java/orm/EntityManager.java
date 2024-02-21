@@ -1,9 +1,13 @@
 package orm;
 
+import annotations.Id;
+
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 
+import static entities.constants.Constants.ID_COLUM_MISSING_MESSAGE;
 import static orm.MyConnector.getConnection;
 
 public class EntityManager<E> implements DBContext {
@@ -19,9 +23,6 @@ public class EntityManager<E> implements DBContext {
         return false;
     }
 
-    private Field getIdColumn(Class<?> aClass) {
-        return null;
-    }
 
     @Override
     public Iterable find(Class table) {
@@ -41,5 +42,11 @@ public class EntityManager<E> implements DBContext {
     @Override
     public Object findFirst(Class table, String where) {
         return null;
+    }
+    private Field getIdColumn(Class<?> entity) {
+        return Arrays.stream(entity.getDeclaredFields())
+                .filter(x -> x.isAnnotationPresent(Id.class))
+                .findFirst()
+                .orElseThrow(() -> new UnsupportedOperationException(ID_COLUM_MISSING_MESSAGE));
     }
 }
