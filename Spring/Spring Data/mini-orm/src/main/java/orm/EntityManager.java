@@ -57,8 +57,22 @@ public class EntityManager<E> implements DBContext<E> {
 
 
     @Override
-    public Iterable find(Class table, String where) {
-        return null;
+    public Iterable<E> find(Class<E> table, String condition) throws SQLException,
+            InvocationTargetException,
+            NoSuchMethodException,
+            InstantiationException,
+            IllegalAccessException {
+
+        final String tableName = getTableName(table);
+        final String finalCondition = condition != null
+                ? WHERE_KEY_WORD + condition
+                : "";
+
+        final PreparedStatement findFirstStatement =
+                connection.prepareStatement(String.format(FIND_ALL_WITH_CONDITION_QUERY, tableName, finalCondition));
+
+        return getPOJOs(findFirstStatement, table);
+
     }
 
     @Override
@@ -125,8 +139,8 @@ public class EntityManager<E> implements DBContext<E> {
 
         return Arrays.stream(aClass.getDeclaredFields())
                 .filter(f -> !f.isAnnotationPresent(Id.class) && f.isAnnotationPresent(Column.class))
-                .map(f -> new EntityManager.KeyValuePair(f.getAnnotationsByType(Column.class)[0].name(), mapFieldsToGivenType(f, entity)))
-                .collect(Collectors.toList());
+                .map(f -> new EntityManager.KeyValuePair(f.getAnnotationsByType(Column.class)[0].name(),
+                        mapFieldsToGivenType(f, entity))).collect(Collectors.toList());
     }
 
     private String mapFieldsToGivenType(Field field, E entity) {
