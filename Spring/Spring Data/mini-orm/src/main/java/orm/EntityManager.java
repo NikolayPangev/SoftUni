@@ -5,9 +5,13 @@ import annotations.Entity;
 import annotations.Id;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -39,9 +43,18 @@ public class EntityManager<E> implements DBContext<E> {
     }
 
     @Override
-    public Iterable find(Class table) {
-        return null;
+    public Iterable find(Class table) throws SQLException,
+            InvocationTargetException,
+            NoSuchMethodException,
+            InstantiationException,
+            IllegalAccessException {
+        final String tableName = getTableName(table);
+
+        final PreparedStatement findFirstStatement = connection.prepareStatement(String.format(FIND_ALL_QUERY, tableName));
+
+        return getPOJOs(findFirstStatement, table);
     }
+
 
     @Override
     public Iterable find(Class table, String where) {
@@ -61,8 +74,7 @@ public class EntityManager<E> implements DBContext<E> {
     private Field getIdColumn(Class<?> entity) {
         return Arrays.stream(entity.getDeclaredFields())
                 .filter(x -> x.isAnnotationPresent(Id.class))
-                .findFirst()
-                .orElseThrow(() -> new UnsupportedOperationException(ID_COLUM_MISSING_MESSAGE));
+                .findFirst().orElseThrow(() -> new UnsupportedOperationException(ID_COLUM_MISSING_MESSAGE));
     }
 
 
@@ -113,8 +125,7 @@ public class EntityManager<E> implements DBContext<E> {
 
         return Arrays.stream(aClass.getDeclaredFields())
                 .filter(f -> !f.isAnnotationPresent(Id.class) && f.isAnnotationPresent(Column.class))
-                .map(f -> new EntityManager.KeyValuePair(f.getAnnotationsByType(Column.class)[0].name(),
-                        mapFieldsToGivenType(f, entity)))
+                .map(f -> new EntityManager.KeyValuePair(f.getAnnotationsByType(Column.class)[0].name(), mapFieldsToGivenType(f, entity)))
                 .collect(Collectors.toList());
     }
 
@@ -128,9 +139,52 @@ public class EntityManager<E> implements DBContext<E> {
             e.printStackTrace();
         }
 
-        return o instanceof String || o instanceof LocalDate
-                ? "'" + o + "'"
-                : Objects.requireNonNull(o).toString();
+        return o instanceof String || o instanceof LocalDate ? "'" + o + "'" : Objects.requireNonNull(o).toString();
+    }
+
+    private Iterable<E> getPOJOs(PreparedStatement findFirstStatement, Class<E> table) throws SQLException,
+            NoSuchMethodException,
+            InvocationTargetException,
+            InstantiationException,
+            IllegalAccessException {
+
+        final ResultSet resultSet = findFirstStatement.executeQuery();
+
+        List<E> entities = new ArrayList<>();
+
+        while (resultSet.next()) {
+            final E entity = table.getDeclaredConstructor().newInstance();
+
+            fillEntity(table, resultSet, entity);
+
+            entities.add(entity);
+        }
+
+        return entities;
+    }
+
+    private void fillEntity(Class<E> table, ResultSet resultSet, E entity) {
+        Arrays.stream(table.getDeclaredFields()).forEach(field -> fillFiled(field, resultSet, entity));
+    }
+
+    private void fillFiled(Field field, ResultSet resultSet, E entity) {
+        final Class<?> type = field.getType();
+        field.setAccessible(true);
+
+        try {
+            if (type == int.class || type == long.class) {
+                field.set(entity, resultSet.getInt(field.getName()));
+                return;
+            } else if (type == LocalDate.class) {
+                field.set(entity, LocalDate.parse(resultSet.getString(field.getName())));
+                return;
+            }
+
+            field.set(entity, resultSet.getString(field.getName()));
+        } catch (SQLException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public record KeyValuePair(String key, String value) {
