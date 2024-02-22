@@ -10,6 +10,7 @@ public enum Constants {
         ;
         public static final String INSET_QUERY_FORMAT = "INSERT INTO %s (%s) VALUES (%s)";
         public static final String UPDATE_QUERY_BY_ID_FORMAT = "UPDATE %s e SET %s WHERE e.id = %d";
+        public static final String FIND_ALL_QUERY = "SELECT * FROM %s";
         public static final String CREATE_VALUE_FORMAT = "%s %s";
 
         public static final String UPDATE_VALUE_FORMAT = "%s = %s";
