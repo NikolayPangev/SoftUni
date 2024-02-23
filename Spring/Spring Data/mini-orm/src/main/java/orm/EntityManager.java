@@ -135,8 +135,18 @@ public class EntityManager<E> implements DBContext<E> {
 
     @Override
     public void doDelete(E entity) throws SQLException, IllegalAccessException {
+        final String tableName = getTableName(entity.getClass());
+        final Field idField = getIdColumn(entity.getClass());
+        final String idColumnName = getSQLColumnName(idField);
+        final Object fieldValue = getFieldValue(entity, idField);
 
+        connection.prepareStatement(String.format(DELETE_RECORD_BY_CONDITION_FORMAT,
+                        tableName,
+                        idColumnName,
+                        fieldValue))
+                .executeUpdate();
     }
+
     private Object getFieldValue(E entity, Field field) throws IllegalAccessException {
         field.setAccessible(true);
         return field.get(entity);
