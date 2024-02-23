@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static entities.constants.Constants.*;
 import static entities.constants.Constants.Queries.*;
+import static entities.constants.Constants.SQLTypes.*;
 import static orm.MyConnector.getConnection;
 
 public class EntityManager<E> implements DBContext<E> {
@@ -138,6 +139,16 @@ public class EntityManager<E> implements DBContext<E> {
     @Override
     public void doDelete(E entity) throws SQLException, IllegalAccessException {
 
+    }
+
+    private String getSQLType(Class<?> type) {
+        if (type == Integer.class || type == int.class || type == long.class || type == Long.class) {
+            return INT;
+        } else if (type == LocalDate.class) {
+            return DATE;
+        }
+
+        return VARCHAR;
     }
 
     private List<Field> getAllFieldsWithoutId(Class<E> entity) {
