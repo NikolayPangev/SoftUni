@@ -76,9 +76,20 @@ public class EntityManager<E> implements DBContext<E> {
     }
 
     @Override
-    public Object findFirst(Class table) {
-        return null;
+    public Object findFirst(Class table) throws SQLException,
+            InvocationTargetException,
+            NoSuchMethodException,
+            InstantiationException,
+            IllegalAccessException {
+        final String tableName = getTableName(table);
+
+        final PreparedStatement findFirstStatement =
+                connection.prepareStatement(String.format(FIND_FIRST_QUERY, tableName));
+
+        return getPOJO(findFirstStatement, table);
     }
+
+
 
     @Override
     public Object findFirst(Class table, String where) {
@@ -154,6 +165,22 @@ public class EntityManager<E> implements DBContext<E> {
         }
 
         return o instanceof String || o instanceof LocalDate ? "'" + o + "'" : Objects.requireNonNull(o).toString();
+    }
+
+    private E getPOJO(PreparedStatement findFirstStatement, Class<E> table) throws SQLException,
+            NoSuchMethodException,
+            InvocationTargetException,
+            InstantiationException,
+            IllegalAccessException {
+
+        final ResultSet resultSet = findFirstStatement.executeQuery();
+        resultSet.next();
+
+        final E entity = table.getDeclaredConstructor().newInstance();
+
+        fillEntity(table, resultSet, entity);
+
+        return entity;
     }
 
     private Iterable<E> getPOJOs(PreparedStatement findFirstStatement, Class<E> table) throws SQLException,
