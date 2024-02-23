@@ -123,7 +123,14 @@ public class EntityManager<E> implements DBContext<E> {
 
     @Override
     public void doAlter(Class<E> entity) throws SQLException {
+        final String tableName = getTableName(entity);
 
+        final String partialAddColumnsStatement = addColumnsStatementForNewFields(entity, tableName);
+
+        connection.prepareStatement(String.format(ALTER_TABLE_FORMAT,
+                        tableName,
+                        partialAddColumnsStatement))
+                .executeUpdate();
     }
 
     @Override
