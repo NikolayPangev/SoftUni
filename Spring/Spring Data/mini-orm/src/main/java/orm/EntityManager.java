@@ -11,10 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static entities.constants.Constants.*;
@@ -132,6 +129,21 @@ public class EntityManager<E> implements DBContext<E> {
     @Override
     public void doDelete(E entity) throws SQLException, IllegalAccessException {
 
+    }
+
+    private Set<String> getSQLColumnNames(String tableName) throws SQLException {
+        Set<String> allFields = new HashSet<>();
+
+        final PreparedStatement getAllFieldsStatement = connection.prepareStatement(GET_ALL_COLUMN_NAMES_BY_TABLE_NAME);
+        getAllFieldsStatement.setString(1, tableName);
+
+        final ResultSet allFieldsResultSet = getAllFieldsStatement.executeQuery();
+
+        while (allFieldsResultSet.next()) {
+            allFields.add(allFieldsResultSet.getString(1));
+        }
+
+        return allFields;
     }
 
     private List<EntityManager.KeyValuePair> getAllFieldsAndDataTypes(Class<E> entity) {
