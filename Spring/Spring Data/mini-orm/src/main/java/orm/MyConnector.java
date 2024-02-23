@@ -11,12 +11,13 @@ enum MyConnector {
 
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/";
     private static final String USER_KEY = "user";
-    private static final String USER_VALUE = "root";
     private static final String PASSWORD_KEY = "password";
-    private static final String PASSWORD_VALUE = "12345";
-    private static final String DATABASE_NAME = "mini-orm";
     private static final String PARAMETERS_FOR_THE_DATABASE =
             "?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC";
+
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "12345";
+    private static final String DATABASE_NAME = "mini-orm";
 
     public static Connection getConnection() throws SQLException {
         createConnection();
@@ -27,9 +28,9 @@ enum MyConnector {
         if (connection != null) return;
 
         Properties properties = new Properties();
-        properties.setProperty(USER_KEY, USER_VALUE);
-        properties.setProperty(PASSWORD_KEY, PASSWORD_VALUE);
+        properties.setProperty(USER_KEY, USERNAME);
+        properties.setProperty(PASSWORD_KEY, PASSWORD);
 
-        DriverManager.getConnection(JDBC_URL + DATABASE_NAME + PARAMETERS_FOR_THE_DATABASE, properties);
+        connection = DriverManager.getConnection(JDBC_URL + DATABASE_NAME + PARAMETERS_FOR_THE_DATABASE, properties);
     }
 }
