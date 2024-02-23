@@ -109,6 +109,43 @@ public class EntityManager<E> implements DBContext<E> {
         return getPOJO(findFirstStatement, table);
     }
 
+    @Override
+    public void doCreate(Class<E> entity) throws SQLException {
+        final String tableName = getTableName(entity);
+
+        final List<KeyValuePair> fieldsAndTypes = getAllFieldsAndDataTypes(entity);
+
+        String fieldsWithTypesFormat = fieldsAndTypes.stream()
+                .map(keyValuePair -> String.format(CREATE_VALUE_FORMAT, keyValuePair.key, keyValuePair.value))
+                .collect(Collectors.joining(COMMA_SEPARATOR));
+
+        connection.prepareStatement(String.format(CREATE_TABLE_QUERY_FORMAT, tableName, fieldsWithTypesFormat))
+                .execute();
+    }
+
+    private List<EntityManager.KeyValuePair> getAllFieldsAndDataTypes(Class<E> entity) {
+        return getAllFieldsWithoutId(entity)
+                .stream()
+                .map(f -> new EntityManager.KeyValuePair(getSQLColumnName(f), getSQLType(f.getType())))
+                .toList();
+    }
+
+    @Override
+    public void doAlter(Class<E> entity) throws SQLException {
+
+    }
+
+    @Override
+    public void doDelete(E entity) throws SQLException, IllegalAccessException {
+
+    }
+
+    private List<Field> getAllFieldsWithoutId(Class<E> entity) {
+        return Arrays.stream(entity.getDeclaredFields())
+                .filter(f -> !f.isAnnotationPresent(Id.class) && f.isAnnotationPresent(Column.class))
+                .toList();
+    }
+
     private boolean doInsert(E entity) throws SQLException {
         final String tableName = getTableName(entity.getClass());
 
