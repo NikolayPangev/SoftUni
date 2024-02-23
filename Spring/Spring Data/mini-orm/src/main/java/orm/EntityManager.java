@@ -130,6 +130,31 @@ public class EntityManager<E> implements DBContext<E> {
     public void doDelete(E entity) throws SQLException, IllegalAccessException {
 
     }
+    private Object getFieldValue(E entity, Field field) throws IllegalAccessException {
+        field.setAccessible(true);
+        return field.get(entity);
+    }
+
+    private String addColumnsStatementForNewFields(Class<E> entity, String tableName) throws SQLException {
+        final Set<String> sqlColumnNames = getSQLColumnNames(tableName);
+        final List<Field> allFieldsWithoutId = getAllFieldsWithoutId(entity);
+
+        List<String> nonMatchingFields = new ArrayList<>();
+
+        for (Field field : allFieldsWithoutId) {
+            final String columnName = getSQLColumnName(field);
+
+            if (sqlColumnNames.contains(columnName)) continue;
+
+            final String columnType = getSQLType(field.getType());
+
+            final String partialAddStatement = String.format(ADD_COLUMN_FORMAT, columnName, columnType);
+
+            nonMatchingFields.add(partialAddStatement);
+        }
+
+        return String.join(COMMA_SEPARATOR, nonMatchingFields);
+    }
 
     private Set<String> getSQLColumnNames(String tableName) throws SQLException {
         Set<String> allFields = new HashSet<>();
