@@ -124,13 +124,6 @@ public class EntityManager<E> implements DBContext<E> {
                 .execute();
     }
 
-    private List<EntityManager.KeyValuePair> getAllFieldsAndDataTypes(Class<E> entity) {
-        return getAllFieldsWithoutId(entity)
-                .stream()
-                .map(f -> new EntityManager.KeyValuePair(getSQLColumnName(f), getSQLType(f.getType())))
-                .toList();
-    }
-
     @Override
     public void doAlter(Class<E> entity) throws SQLException {
 
@@ -139,6 +132,17 @@ public class EntityManager<E> implements DBContext<E> {
     @Override
     public void doDelete(E entity) throws SQLException, IllegalAccessException {
 
+    }
+
+    private List<EntityManager.KeyValuePair> getAllFieldsAndDataTypes(Class<E> entity) {
+        return getAllFieldsWithoutId(entity)
+                .stream()
+                .map(f -> new EntityManager.KeyValuePair(getSQLColumnName(f), getSQLType(f.getType())))
+                .toList();
+    }
+
+    private String getSQLColumnName(Field field) {
+        return field.getAnnotationsByType(Column.class)[0].name();
     }
 
     private String getSQLType(Class<?> type) {
