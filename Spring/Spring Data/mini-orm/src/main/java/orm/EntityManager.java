@@ -90,18 +90,24 @@ public class EntityManager<E> implements DBContext<E> {
     }
 
 
-
     @Override
-    public Object findFirst(Class table, String where) {
-        return null;
-    }
+    public E findFirst(Class<E> table, String condition) throws
+            SQLException,
+            InvocationTargetException,
+            NoSuchMethodException,
+            InstantiationException,
+            IllegalAccessException {
 
-    private Field getIdColumn(Class<?> entity) {
-        return Arrays.stream(entity.getDeclaredFields())
-                .filter(x -> x.isAnnotationPresent(Id.class))
-                .findFirst().orElseThrow(() -> new UnsupportedOperationException(ID_COLUM_MISSING_MESSAGE));
-    }
+        final String tableName = getTableName(table);
+        final String finalCondition = condition != null
+                ? WHERE_KEY_WORD + condition
+                : "";
 
+        final PreparedStatement findFirstStatement =
+                connection.prepareStatement(String.format(FIND_FIRST_WITH_CONDITION_QUERY, tableName, finalCondition));
+
+        return getPOJO(findFirstStatement, table);
+    }
 
     private boolean doInsert(E entity) throws SQLException {
         final String tableName = getTableName(entity.getClass());
@@ -137,35 +143,6 @@ public class EntityManager<E> implements DBContext<E> {
         return connection.prepareStatement(insertQuery).execute();
     }
 
-    private String getTableName(Class<?> aClass) {
-        final Entity[] annotationsByType = aClass.getAnnotationsByType(Entity.class);
-
-        if (annotationsByType.length == 0) throw new UnsupportedOperationException(CLASS_MUST_BE_ENTITY_MESSAGE);
-
-        return annotationsByType[0].name();
-    }
-
-    private List<EntityManager.KeyValuePair> getKeyValuePairs(E entity) {
-        final Class<?> aClass = entity.getClass();
-
-        return Arrays.stream(aClass.getDeclaredFields())
-                .filter(f -> !f.isAnnotationPresent(Id.class) && f.isAnnotationPresent(Column.class))
-                .map(f -> new EntityManager.KeyValuePair(f.getAnnotationsByType(Column.class)[0].name(),
-                        mapFieldsToGivenType(f, entity))).collect(Collectors.toList());
-    }
-
-    private String mapFieldsToGivenType(Field field, E entity) {
-        field.setAccessible(true);
-
-        Object o = null;
-        try {
-            o = field.get(entity);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        return o instanceof String || o instanceof LocalDate ? "'" + o + "'" : Objects.requireNonNull(o).toString();
-    }
 
     private E getPOJO(PreparedStatement findFirstStatement, Class<E> table) throws SQLException,
             NoSuchMethodException,
@@ -226,6 +203,42 @@ public class EntityManager<E> implements DBContext<E> {
             e.printStackTrace();
         }
 
+    }
+
+    private Field getIdColumn(Class<?> entity) {
+        return Arrays.stream(entity.getDeclaredFields())
+                .filter(x -> x.isAnnotationPresent(Id.class))
+                .findFirst().orElseThrow(() -> new UnsupportedOperationException(ID_COLUM_MISSING_MESSAGE));
+    }
+
+    private String getTableName(Class<?> aClass) {
+        final Entity[] annotationsByType = aClass.getAnnotationsByType(Entity.class);
+
+        if (annotationsByType.length == 0) throw new UnsupportedOperationException(CLASS_MUST_BE_ENTITY_MESSAGE);
+
+        return annotationsByType[0].name();
+    }
+
+    private List<EntityManager.KeyValuePair> getKeyValuePairs(E entity) {
+        final Class<?> aClass = entity.getClass();
+
+        return Arrays.stream(aClass.getDeclaredFields())
+                .filter(f -> !f.isAnnotationPresent(Id.class) && f.isAnnotationPresent(Column.class))
+                .map(f -> new EntityManager.KeyValuePair(f.getAnnotationsByType(Column.class)[0].name(),
+                        mapFieldsToGivenType(f, entity))).collect(Collectors.toList());
+    }
+
+    private String mapFieldsToGivenType(Field field, E entity) {
+        field.setAccessible(true);
+
+        Object o = null;
+        try {
+            o = field.get(entity);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return o instanceof String || o instanceof LocalDate ? "'" + o + "'" : Objects.requireNonNull(o).toString();
     }
 
     public record KeyValuePair(String key, String value) {
