@@ -1,4 +1,4 @@
-package entities;
+import entities.Town;
 
 import javax.persistence.EntityManager;
 import java.util.List;
