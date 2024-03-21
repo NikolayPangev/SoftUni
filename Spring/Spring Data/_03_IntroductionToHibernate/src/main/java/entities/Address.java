@@ -32,7 +32,7 @@ public class Address {
     }
 
     @ManyToOne
-    @JoinColumn(name = "town_id",referencedColumnName = "town_id")
+    @JoinColumn(name = "town_id", referencedColumnName = "town_id")
     public Town getTown() {
         return town;
     }
@@ -48,5 +48,9 @@ public class Address {
 
     public void setEmployees(Set<Employee> employees) {
         this.employees = employees;
+    }
+
+    public void printGeneralInformation() {
+        System.out.printf("%s, %s, %d%n", this.text, this.town.getName(), this.employees.size());
     }
 }
