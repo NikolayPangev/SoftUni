@@ -22,5 +22,5 @@ public class Wizard {
     @Column(nullable = false)
     private Integer age;
 
-    
+
 }
