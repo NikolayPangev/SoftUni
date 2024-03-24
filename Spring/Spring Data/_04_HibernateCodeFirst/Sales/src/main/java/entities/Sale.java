@@ -5,12 +5,14 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
 @Table
-public class Sale extends BaseEntity{
+public class Sale extends BaseEntity {
+
     @ManyToOne
     private Product product;
 
