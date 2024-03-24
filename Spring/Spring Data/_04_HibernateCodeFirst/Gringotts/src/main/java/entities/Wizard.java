@@ -1,6 +1,7 @@
 package entities;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "wizards")
@@ -22,5 +23,11 @@ public class Wizard {
     @Column(nullable = false)
     private Integer age;
 
+    @OneToOne
+    @JoinColumn
+    private MagicWand magicWand;
 
+    @OneToMany
+    @JoinTable(name = "wizard_deposits")
+    private List<Deposit> deposits;
 }
