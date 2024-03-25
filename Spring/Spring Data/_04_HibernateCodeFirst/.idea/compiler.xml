@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="Gringotts" />
         <module name="BillsPaymentSystem" />
+        <module name="FootballBetting" />
         <module name="Sales" />
         <module name="Hospital" />
         <module name="University-System" />
