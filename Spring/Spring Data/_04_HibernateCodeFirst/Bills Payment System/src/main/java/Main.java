@@ -1,10 +1,8 @@
-package org.example;
-
 import javax.persistence.Persistence;
 
 public class Main {
     public static void main(String[] args) {
-        Persistence.createEntityManagerFactory("bills_payment")
+        Persistence.createEntityManagerFactory("bills-payment")
                 .createEntityManager();
     }
 }
