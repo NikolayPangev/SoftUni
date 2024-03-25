@@ -1,5 +1,3 @@
-package org.example;
-
 import javax.persistence.Persistence;
 
 public class Main {
