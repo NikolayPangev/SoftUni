@@ -15,5 +15,5 @@ public class Color extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
-    
+
 }
