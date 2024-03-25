@@ -1,5 +1,6 @@
 package entities;
 
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,14 +12,14 @@ import javax.persistence.Table;
 @Setter
 @Entity
 @Table
-public class CreditCard extends BillingDetails{
+public class CreditCard extends BillingDetails {
 
-    @Column(name = "card_type", nullable = false, length = 50)
+    @Column(name = "card_type", nullable = false, length = 30)
     private String cardType;
 
-    @Column(name = "expiration_month", nullable = false)
+    @Column(name = "exp_month", nullable = false)
     private Short expirationMonth;
 
-    @Column(name = "expiration_year")
+    @Column(name = "exp_year", nullable = false)
     private Short expirationYear;
 }

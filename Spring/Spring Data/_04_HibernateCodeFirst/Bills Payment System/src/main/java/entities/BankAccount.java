@@ -18,4 +18,5 @@ public class BankAccount extends BillingDetails {
 
     @Column(name = "SWIFT_code", length = 50)
     private String swiftCode;
+
 }
