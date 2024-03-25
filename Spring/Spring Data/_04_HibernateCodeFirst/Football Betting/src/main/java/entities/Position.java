@@ -20,5 +20,5 @@ public class Position {
 
     @Column
     private String description;
-    
+
 }
