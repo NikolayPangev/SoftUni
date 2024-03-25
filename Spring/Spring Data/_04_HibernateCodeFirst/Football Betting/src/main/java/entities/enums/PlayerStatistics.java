@@ -31,5 +31,5 @@ public class PlayerStatistics implements Serializable {
 
     @Column
     private Short playedMinutes;
-    
+
 }
