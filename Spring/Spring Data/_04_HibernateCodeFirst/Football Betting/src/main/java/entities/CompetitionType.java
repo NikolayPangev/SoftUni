@@ -15,4 +15,5 @@ public class CompetitionType extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
+
 }
