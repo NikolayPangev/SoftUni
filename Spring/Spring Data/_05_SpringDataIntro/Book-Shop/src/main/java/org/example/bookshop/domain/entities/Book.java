@@ -1,10 +1,7 @@
 package org.example.bookshop.domain.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.example.bookshop.domain.enums.AgeRestriction;
 import org.example.bookshop.domain.enums.EditionType;
 
@@ -16,6 +13,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "books")
 public class Book extends BaseEntity {
