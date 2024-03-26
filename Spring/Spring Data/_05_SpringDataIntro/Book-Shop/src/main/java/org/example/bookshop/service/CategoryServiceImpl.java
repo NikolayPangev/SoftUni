@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -24,6 +25,16 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void seedCategories(List<Category> categories) {
+        this.categoryRepository.saveAllAndFlush(categories);
+    }
 
+    @Override
+    public Category getRandomCategory() {
+        return null;
+    }
+
+    @Override
+    public Set<Category> getRandomCategories() {
+        return null;
     }
 }

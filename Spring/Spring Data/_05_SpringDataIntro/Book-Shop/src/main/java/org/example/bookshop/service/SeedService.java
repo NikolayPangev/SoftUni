@@ -1,17 +1,19 @@
 package org.example.bookshop.service;
 
+import java.io.IOException;
+
 public interface SeedService {
 
-    void seedAuthors();
+    void seedAuthors() throws IOException;
 
-    void seedBooks();
+    void seedBooks() throws IOException;
 
-    void seedCategories();
+    void seedCategories() throws IOException;
 
-    default void seedAllData() {
+    default void seedAllData() throws IOException {
+        seedCategories();
         seedAuthors();
         seedBooks();
-        seedAuthors();
     }
 }
 
