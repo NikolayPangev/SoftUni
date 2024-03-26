@@ -1,4 +1,4 @@
-package org.example.bookshop.domain.repositories;
+package org.example.bookshop.repositories;
 
 import org.example.bookshop.domain.entities.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
