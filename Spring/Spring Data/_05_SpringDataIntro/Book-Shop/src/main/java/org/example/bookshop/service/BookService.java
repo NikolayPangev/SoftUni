@@ -8,7 +8,7 @@ public interface BookService {
 
     boolean isDataSeeded();
 
-    void seedCategories(List<Book> books);
+    void seedBooks(List<Book> books);
 
 }
 

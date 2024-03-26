@@ -23,7 +23,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void seedCategories(List<Book> books) {
-
+    public void seedBooks(List<Book> books) {
+        this.bookRepository.saveAllAndFlush(books);
     }
 }
