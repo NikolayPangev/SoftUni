@@ -5,8 +5,7 @@ import org.example.bookshop.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -30,11 +29,24 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category getRandomCategory() {
-        return null;
+        final long count = this.categoryRepository.count();
+
+        if (count != 0) {
+            long randomId = new Random().nextLong(1L, count) + 1L;
+            return this.categoryRepository.findById(randomId).orElseThrow(NoSuchElementException::new);
+        }
+
+        throw new RuntimeException();
     }
 
     @Override
     public Set<Category> getRandomCategories() {
-        return null;
+        Set<Category> categories = new HashSet<>();
+
+        for (int i = 0; i < 1; i++) {
+            categories.add(getRandomCategory());
+        }
+
+        return categories;
     }
 }

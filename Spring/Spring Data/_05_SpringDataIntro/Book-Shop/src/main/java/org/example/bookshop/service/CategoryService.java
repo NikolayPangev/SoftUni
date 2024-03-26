@@ -9,7 +9,7 @@ public interface CategoryService {
 
     boolean isDataSeeded();
 
-    void seedCategories(List<Category> categories);
+    void seedCategories(List<Category> authors);
 
     Category getRandomCategory();
 
