@@ -1,6 +1,6 @@
 package org.example.mobilelele.repository;
 
-import ch.qos.logback.core.model.Model;
+import org.example.mobilelele.model.entities.Model;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
