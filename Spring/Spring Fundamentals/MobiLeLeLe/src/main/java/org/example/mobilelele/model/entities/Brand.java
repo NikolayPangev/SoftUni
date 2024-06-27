@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "brands")
-public class Brand extends BaseEntity{
+public class Brand extends BaseEntity {
 
     @Column(unique = true, nullable = false)
     private String name;
