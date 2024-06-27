@@ -1,4 +1,4 @@
-package org.example.mobilelele.Service.role;
+package org.example.mobilelele.service.role;
 
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package org.example.mobilelele.Service.user;
+package org.example.mobilelele.service.user;
 
 import org.springframework.stereotype.Service;
 

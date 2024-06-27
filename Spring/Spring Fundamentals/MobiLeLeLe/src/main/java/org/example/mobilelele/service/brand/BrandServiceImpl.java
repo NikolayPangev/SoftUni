@@ -1,4 +1,4 @@
-package org.example.mobilelele.Service.brand;
+package org.example.mobilelele.service.brand;
 
 import org.springframework.stereotype.Service;
 
