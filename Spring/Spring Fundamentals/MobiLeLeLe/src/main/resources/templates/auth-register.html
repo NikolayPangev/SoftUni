@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
       <meta charset="UTF-8">
@@ -67,7 +67,7 @@
 
 <div class="container">
     <h2 class="text-center text-white">Register User</h2>
-    <form method="POST" 
+    <form th:action="@{/users/register}" th:method="POST"
           class="main-form mx-auto col-md-8 d-flex flex-column justify-content-center">
         <div class="row">
             <div class="form-group col-md-6 mb-3">
@@ -108,8 +108,9 @@
         <div class="form-group">
             <label class="text-center text-white font-weight-bold" for="roles">Roles</label>
             <select  id="roles" class="form-control" multiple>
-                <option>
-                </option>
+                <tr th:each="role: ${roles}">
+                    <option th:text="${role.role}" th:value="${role.role}"></option>
+                </tr>
             </select>
             <p class="errors alert alert-danger">
                 Selecting a role is required.

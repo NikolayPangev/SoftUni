@@ -4,7 +4,6 @@ import org.example.mobilelele.model.dtoS.view.UserRoleViewDto;
 import org.example.mobilelele.model.entities.UserRole;
 import org.example.mobilelele.model.enums.Role;
 import org.example.mobilelele.repository.RoleRepository;
-import org.example.mobilelele.service.init.DataBaseInitService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class UserRoleServiceImpl implements UserRoleService, DataBaseInitService {
+public class UserRoleServiceImpl implements UserRoleService {
 
     private final RoleRepository roleRepository;
     private final ModelMapper modelMapper;
@@ -23,16 +22,19 @@ public class UserRoleServiceImpl implements UserRoleService, DataBaseInitService
     public UserRoleServiceImpl(RoleRepository roleRepository, ModelMapper modelMapper) {
         this.roleRepository = roleRepository;
         this.modelMapper = modelMapper;
+        this.dbInit();
     }
 
     @Override
     public void dbInit() {
-        List<UserRole> roles = new ArrayList<>();
+        if (!isDbInit()) {
+            List<UserRole> roles = new ArrayList<>();
 
-        roles.add(new UserRole().setRole(Role.USER));
-        roles.add(new UserRole().setRole(Role.ADMIN));
+            roles.add(new UserRole().setRole(Role.USER));
+            roles.add(new UserRole().setRole(Role.ADMIN));
 
-        this.roleRepository.saveAllAndFlush(roles);
+            this.roleRepository.saveAllAndFlush(roles);
+        }
     }
 
     @Override
